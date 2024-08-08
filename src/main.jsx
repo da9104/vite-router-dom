@@ -14,7 +14,7 @@ import App from './App'
 
 const router = createBrowserRouter([
   {
-    path: "/vite-router-dom",
+    path: "/",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
@@ -22,18 +22,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <App /> },
       {
-        path: "vite-router-dom/contacts/:contactId",
+        path: "contacts/:contactId",
         element: <Contact />,
         loader: contactLoader,
       },
       {
-        path: "vite-router-dom/contacts/:contactId/edit",
+        path: "contacts/:contactId/edit",
         element: <EditContact />,
         loader: contactLoader,
         action: editAction,
       },
       {
-        path: "vite-router-dom/contacts/:contactId/destroy",
+        path: "contacts/:contactId/destroy",
         action: destroyAction,
       },
     ],
