@@ -34,8 +34,6 @@ export async function updateContact(id, updates) {
 }
 
 export function Contacts({ showMenu }) {
- 
-
   var list = []
   for (var i =0; i <contents.length; i++) {
     list.push(
@@ -78,11 +76,11 @@ function Root() {
       document.getElementById("q").value = q;
     }, [q]);
 
-  const searching =
-  navigation.location &&
-  new URLSearchParams(navigation.location.search).has(
-    "q"
-  );
+    const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      "q"
+    );
 
 
   return (
