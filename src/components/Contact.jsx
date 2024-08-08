@@ -28,6 +28,15 @@ import { getContact } from '../Root'
     return newContact;
   }
 
+  export async function deleteContact(id) {
+    const index = contents.findIndex(contact => contact.id === parseInt(id));
+    if (index !== -1) {
+      contents.splice(index, 1);
+      return true; // Indicates successful deletion
+    }
+    return false; // Indicates contact not found
+  }
+
 export function Favorite({ contact }) {
     const favorite = contact.favorite;
     return (
@@ -106,7 +115,8 @@ export default function Contact() {
             </Form>
             <Form
               method="post"
-              action={`/contacts/${contactId}/destroy`}
+              action="destroy"
+              // action={`/contacts/${contactId}/destroy`}
               onSubmit={(event) => {
                 if (
                   !confirm(

@@ -7,8 +7,10 @@ import {
 import Root, { loader as rootLoader, action as rootAction } from './Root.jsx'
 import ErrorPage from './components/ErrorPage.jsx'
 import Contact, { loader as contactLoader } from './components/Contact.jsx'
-import EditContact, { action as editAction } from './components/Edit.jsx';
+import EditContact, { action as editAction } from './components/Edit.jsx'
+import { action as destroyAction } from './components/Destroy.jsx'
 import './index.css'
+import App from './App'
 
 const router = createBrowserRouter([
   {
@@ -18,6 +20,7 @@ const router = createBrowserRouter([
     loader: rootLoader,
     action: rootAction,
     children: [
+      { index: true, element: <App /> },
       {
         path: "contacts/:contactId",
         element: <Contact />,
@@ -28,6 +31,10 @@ const router = createBrowserRouter([
         element: <EditContact />,
         loader: contactLoader,
         action: editAction,
+      },
+      {
+        path: "contacts/:contactId/destroy",
+        action: destroyAction,
       },
     ],
   },

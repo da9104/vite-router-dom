@@ -1,17 +1,20 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Contact, { createContact } from './components/Contact'
 import { contents } from './dummydata'
-import { Link, Outlet, Form, useLoaderData } from 'react-router-dom'
+import { Link, Outlet, Form, useLoaderData, redirect, NavLink, useNavigation, useSubmit } from 'react-router-dom'
 import './App.css'
 
-export async function loader() {
-   return { contacts: contents };
+export async function loader({ request }) {
+    const url = new URL(request.url);
+    const q = url.searchParams.get("q");
+    const contacts = await getContact(q);
+    return { contacts, q };
  }
  
  export async function action() {
   const contact = await createContact();
-  return { contact };
+  return redirect(`/contacts/${contact.id}/edit`);
 }
 
 export function getContact(id) {
@@ -20,16 +23,33 @@ export function getContact(id) {
   return contents.find(contact => contact.id === parseInt(id));
 }
 
+export async function updateContact(id, updates) {
+  const index = contents.findIndex(contact => contact.id === parseInt(id));
+  if (index !== -1) {
+      contents[index] = { ...contents[index], ...updates };
+      return contents[index];
+  }
+  return null;
+}
+
 export function Contacts({ showMenu }) {
   var list = []
   for (var i =0; i <contents.length; i++) {
     list.push(
-      <li key={contents[i].id}>
-        <Link 
-        className='flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700'
+      <li 
+      className='flex items-center w-full p-2'
+      key={contents[i].id}>
+        <NavLink 
+        className={({ isActive, isPending }) =>
+          isActive
+            ? "active flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-16 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+            : isPending
+            ? "pending flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+            : ""
+        }
         to={'/contacts/'+contents[i].id}>
           {contents[i].first}
-        </Link>
+        </NavLink>
       </li>
     )
   }
@@ -46,8 +66,20 @@ export function Contacts({ showMenu }) {
 function Root() {
   const [showMenu, setShowMenu] = useState(false);
   const toggleShow = () => setShowMenu(!showMenu);
-  const { contacts } = useLoaderData()
+  const navigation = useNavigation();
+  const { contacts, q } = useLoaderData()
+  const submit = useSubmit();
   
+    useEffect(() => {
+      document.getElementById("q").value = q;
+    }, [q]);
+
+  const searching =
+  navigation.location &&
+  new URLSearchParams(navigation.location.search).has(
+    "q"
+  );
+
 
   return (
     <>
@@ -59,15 +91,24 @@ function Root() {
          <Form id="search-form" role="search">
             <input
               id="q"
+              onChange={(event) => {
+                const isFirstSearch = q == null;
+                submit(event.currentTarget.form, {
+                  replace: !isFirstSearch,
+                })
+              }}
+              className={searching ? "loading" : ""}
               aria-label="Search contacts"
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={q}
+             
             />
             <div
               id="search-spinner"
               aria-hidden
-              hidden={true}
+              hidden={!searching}
             />
             <div
               className="sr-only"
@@ -115,7 +156,11 @@ function Root() {
     <div class="p-4 sm:ml-64">
       <div class="p-4 border-none">
 
-      <div id="detail">
+      <div id="detail"
+           className={
+            navigation.state === "loading" ? "loading" : ""
+          }
+      >
           <Outlet />
       </div>  
     
