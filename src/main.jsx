@@ -22,18 +22,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <App /> },
       {
-        path: "contacts/:contactId",
+        path: "vite-router-dom/contacts/:contactId",
         element: <Contact />,
         loader: contactLoader,
       },
       {
-        path: "contacts/:contactId/edit",
+        path: "vite-router-dom/contacts/:contactId/edit",
         element: <EditContact />,
         loader: contactLoader,
         action: editAction,
       },
       {
-        path: "contacts/:contactId/destroy",
+        path: "vite-router-dom/contacts/:contactId/destroy",
         action: destroyAction,
       },
     ],
