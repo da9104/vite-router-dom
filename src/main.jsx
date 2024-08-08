@@ -14,7 +14,7 @@ import App from './App'
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/vite-router-dom",
     element: <Root />,
     errorElement: <ErrorPage />,
     loader: rootLoader,
