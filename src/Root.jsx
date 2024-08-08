@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from 'react'
-import Contact, { createContact } from './components/Contact'
+import { createContact } from './components/Contact'
 import { contents } from './dummydata'
 import { Link, useNavigate, Outlet, Form, useLoaderData, redirect, NavLink, useNavigation, useSubmit } from 'react-router-dom'
+import { Favorite } from './components/Contact'
 import './App.css'
 
 export async function loader({ request }) {
     const url = new URL(request.url);
-    const q = url.searchParams.get("q");
+    const q = url.searchParams.get("q") || "";
     const contacts = await getContact(q);
     return { contacts, q };
  }
@@ -18,18 +19,27 @@ export async function loader({ request }) {
 }
 
 export function getContact(id) {
-  console.log("Fetching contact with ID:", id);
-  console.log("Contents array:", contents);
-  return contents.find(contact => contact.id === parseInt(id));
+  const contact = contents.find(contact => contact.id === parseInt(id));
+  // console.log("Fetched contact in getContact:", contact);
+  return contact
 }
 
-export async function updateContact(id, updates) {
-  const index = contents.findIndex(contact => contact.id === parseInt(id));
-  if (index !== -1) {
-      contents[index] = { ...contents[index], ...updates };
-      return contents[index];
+// export async function updateContact(id, updates) {
+//   const index = contents.findIndex(contact => contact.id === parseInt(id));
+//   if (index !== -1) {
+//       contents[index] = { ...contents[index], ...updates };
+//       return contents[index];
+//   }
+//   return null;
+// }
+
+export function updateContact(id, updates) {
+  const contact = contents.find(contact => contact.id === parseInt(id));
+  if (!contact) {
+    throw new Error("Contact not found");
   }
-  return null;
+  Object.assign(contact, updates); // Update the contact with the new data
+  return contact;
 }
 
 export function Contacts({ showMenu }) {
@@ -48,7 +58,8 @@ export function Contacts({ showMenu }) {
             : ""
         }
         to={'/contacts/'+contents[i].id}>
-          {contents[i].first}
+          {contents[i].first} 
+         
         </NavLink>
       </li>
     )
@@ -67,19 +78,15 @@ function Root() {
   const [showMenu, setShowMenu] = useState(false);
   const toggleShow = () => setShowMenu(!showMenu);
   const navigation = useNavigation();
-  // const navigate = useNavigate();
   const { contacts, q } = useLoaderData()
   const submit = useSubmit();
   
+  const searching = navigation.location &&
+  new URLSearchParams(navigation.location.search).has("q");
+
     useEffect(() => {
       document.getElementById("q").value = q;
     }, [q]);
-
-    const searching =
-    navigation.location &&
-    new URLSearchParams(navigation.location.search).has(
-      "q"
-    );
 
 
   return (
@@ -96,7 +103,7 @@ function Root() {
                 const isFirstSearch = q == null;
                 submit(event.currentTarget.form, {
                   replace: !isFirstSearch,
-                })
+                });
               }}
               className={searching ? "loading" : ""}
               aria-label="Search contacts"
@@ -104,7 +111,6 @@ function Root() {
               type="search"
               name="q"
               defaultValue={q}
-             
             />
             <div
               id="search-spinner"

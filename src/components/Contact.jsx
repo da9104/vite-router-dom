@@ -1,10 +1,9 @@
-import { useParams, Form, useLoaderData, useNavigate } from 'react-router-dom'
+import { useParams, Form, useLoaderData, useNavigate, useFetcher, } from 'react-router-dom'
 import { contents } from '../dummydata'
-import { getContact } from '../Root'
+import { getContact, updateContact } from '../Root'
 
   export async function loader({ params }) {
     const contact = getContact(params.contactId);
-    console.log("Fetched contact:", contact);
     if (!contact) {
         throw new Response("", {
             status: 404,
@@ -12,6 +11,24 @@ import { getContact } from '../Root'
         });
     }
     return { contact };
+  }
+
+  export async function action({ request, params }) {
+    try {
+      const formData = await request.formData();
+      console.log(formData, "Contact action:")
+      const updates = {
+        favorite: formData.get("favorite") === "true",
+      };
+      console.log("Updating contact:", updates);
+      const updatedContact = updateContact(params.contactId, updates);
+      console.log("Updated contact:", updatedContact);
+      
+      return updatedContact;
+    } catch (error) {
+    console.error("Error in action:", error);
+    throw error;
+    }
   }
 
   export async function createContact() {
@@ -37,28 +54,30 @@ import { getContact } from '../Root'
   }
 
 export function Favorite({ contact }) {
-    const favorite = contact.favorite;
+  const fetcher = useFetcher();
+  const isFavorite =
+  fetcher.formData ? fetcher.formData.get("favorite") === "true" : contact.favorite;
+
     return (
-      <Form method="post">
+      <fetcher.Form method="post">
         <button
           name="favorite"
-          value={favorite ? "false" : "true"}
+          value={isFavorite ? "false" : "true"}
           aria-label={
-            favorite
+            isFavorite
               ? "Remove from favorites"
               : "Add to favorites"
           }
         >
-          {favorite ? "★" : "☆"}
+          {isFavorite ? "★" : "☆"}
         </button>
-      </Form>
+      </fetcher.Form>
     );
   }
   
 export default function Contact() {
     const { contact } = useLoaderData()
     const { contactId } = useParams();
-    console.log(contact)
 
     //  let params = useParams()
     //  let contactId = params.contactId
@@ -77,6 +96,7 @@ export default function Contact() {
     //     break
     //   }
     // }
+
     if (!contact) {
         return <div>Contact not found</div>; // Handle case where contact is not found
     }
@@ -103,7 +123,7 @@ export default function Contact() {
             ) : (
               <i>No Name</i>
             )}{" "}
-            <Favorite contact={contact} />
+            {contact && <Favorite contact={contact} />}
           </h1>
   
           {contact.notes && <p>{contact.notes}</p>}
@@ -115,7 +135,6 @@ export default function Contact() {
             <Form
               method="post"
               action="destroy"
-              // action={`/contacts/${contactId}/destroy`}
               onSubmit={(event) => {
                 if (
                   !confirm(
