@@ -110,7 +110,7 @@ export default function Contact() {
           {contact.notes && <p>{contact.notes}</p>}
   
           <div>
-            <Form action={`vite-router-dom/contacts/${contactId}/edit`}>
+            <Form action="edit">
               <button type="submit">Edit</button>
             </Form>
             <Form
