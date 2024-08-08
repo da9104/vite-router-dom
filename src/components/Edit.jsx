@@ -2,11 +2,10 @@ import { Form, useLoaderData, redirect, useNavigate } from "react-router-dom";
 import { updateContact } from '../Root'
 
 export async function action({ request, params }) {
-    const navigate = useNavigate();
     const formData = await request.formData();
     const updates = Object.fromEntries(formData);
     await updateContact(params.contactId, updates);
-    return navigate(`/contacts/${params.contactId}`);
+    return redirect(`/contacts/${params.contactId}`);
   }
 
 export default function EditContact() {

@@ -3,7 +3,6 @@ import { contents } from '../dummydata'
 import { getContact } from '../Root'
 
   export async function loader({ params }) {
-    console.log("Loader params:", params);
     const contact = getContact(params.contactId);
     console.log("Fetched contact:", contact);
     if (!contact) {

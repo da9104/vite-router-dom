@@ -13,9 +13,8 @@ export async function loader({ request }) {
  }
  
  export async function action() {
-  const navigate = useNavigate();
   const contact = await createContact();
-  return navigate(`/contacts/${contact.id}/edit`);
+  return redirect(`/contacts/${contact.id}/edit`);
 }
 
 export function getContact(id) {
@@ -68,7 +67,7 @@ function Root() {
   const [showMenu, setShowMenu] = useState(false);
   const toggleShow = () => setShowMenu(!showMenu);
   const navigation = useNavigation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { contacts, q } = useLoaderData()
   const submit = useSubmit();
   
