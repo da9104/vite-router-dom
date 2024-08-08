@@ -1,4 +1,4 @@
-import { useParams, Form, useLoaderData } from 'react-router-dom'
+import { useParams, Form, useLoaderData, useNavigate } from 'react-router-dom'
 import { contents } from '../dummydata'
 import { getContact } from '../Root'
 

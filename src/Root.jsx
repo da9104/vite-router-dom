@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Contact, { createContact } from './components/Contact'
 import { contents } from './dummydata'
-import { Link, Outlet, Form, useLoaderData, redirect, NavLink, useNavigation, useSubmit } from 'react-router-dom'
+import { Link, useNavigate, Outlet, Form, useLoaderData, redirect, NavLink, useNavigation, useSubmit } from 'react-router-dom'
 import './App.css'
 
 export async function loader({ request }) {
@@ -13,8 +13,9 @@ export async function loader({ request }) {
  }
  
  export async function action() {
+  const navigate = useNavigate();
   const contact = await createContact();
-  return redirect(`/contacts/${contact.id}/edit`);
+  return navigate(`/contacts/${contact.id}/edit`);
 }
 
 export function getContact(id) {
@@ -33,6 +34,8 @@ export async function updateContact(id, updates) {
 }
 
 export function Contacts({ showMenu }) {
+ 
+
   var list = []
   for (var i =0; i <contents.length; i++) {
     list.push(
@@ -47,7 +50,7 @@ export function Contacts({ showMenu }) {
             ? "pending flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
             : ""
         }
-        to={'vite-router-dom/contacts/'+contents[i].id}>
+        to={'/contacts/'+contents[i].id}>
           {contents[i].first}
         </NavLink>
       </li>
@@ -67,6 +70,7 @@ function Root() {
   const [showMenu, setShowMenu] = useState(false);
   const toggleShow = () => setShowMenu(!showMenu);
   const navigation = useNavigation();
+  const navigate = useNavigate();
   const { contacts, q } = useLoaderData()
   const submit = useSubmit();
   
@@ -126,7 +130,7 @@ function Root() {
                   <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
                   <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
                </svg>
-               <Link to='/vite-router-dom' className="ms-3">Dashboard </Link>
+               <Link to='/' className="ms-3">Dashboard </Link>
             </a>
          </li>
         
